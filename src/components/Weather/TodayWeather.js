@@ -1,7 +1,8 @@
 import React from 'react';
 import Icon from './Icon';
 
-const API_WEATHER = 'http://demo6468405.mockable.io/weather-crawlers/current-weathers/by-city-name';
+const API_WEATHER = 'http://localhost:8080/weather-crawler/current-weathers/by-city-name';
+const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 class TodayWeather extends React.Component {
   state = {
@@ -9,8 +10,8 @@ class TodayWeather extends React.Component {
   };
 
   async componentDidMount() {
-    // const { cityId } = this.props.match.params;
-    const cityId = 'Daejeon';
+    const { cityId } = this.props.match.params;
+    // const cityId = 'Daejeon';
     const api = `${API_WEATHER}/${cityId}`;
 
     const weather = await fetch(api)
@@ -32,19 +33,38 @@ class TodayWeather extends React.Component {
 
     const celsius = (weather.main.temp - 273.15).toFixed(2); // kelvin to celsius
     const weatherMain = weather.weather[0].main;
-    const iconId = weather.weather[0].id;
+    const weatherIcon = weather.weather[0].icon;
+    const weatherCountry = weather.sys.country;
+    const weatherMains = weather.main;
+    const weatherWind = weather.wind;
 
     return (
       <div className="weather-today">
-        <h2 className="weather-city">{cityId}</h2>
+        <h2 className="weather-city">Weather in {cityId}, {weatherCountry}</h2>
 
         <div className="weather-today-meta">
           <h3 className="weather-main">{weatherMain}</h3>
-          <div className="weather-temp">{celsius}°</div>
+          <div className="weather-image">
+            <Icon iconId={weatherIcon} />
+          </div>
+          <div className="weather-temp">{celsius}°C</div>
         </div>
-        <div className="weather-image">
-          <Icon iconId={iconId} />
-        </div>
+
+        <table className="weather-table">
+          <tr>
+            <th>Wind</th>
+            <td>{weatherWind.speed} m/s</td>
+          </tr>
+          <tr>
+            <th>Pressure</th>
+            <td>{weatherMains.pressure} hpa</td>
+          </tr>
+          <tr>
+            <th>Humidity</th>
+            <td>{weatherMains.humidity} %</td>
+          </tr>
+        </table>
+        
       </div>
     );
   }
